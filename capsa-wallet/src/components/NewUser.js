@@ -21,7 +21,7 @@ function NewUser() {
     }
   };
   return (
-    <div className="m-4 flex justify-center bg-base-200 h-screen items-center w-full">
+    <div className="m-4 flex justify-center bg-base-200 h-screen items-center">
       <div className="absolute top-40 left-10">
         <button
           className="btn btn-circle btn-outline"
@@ -89,7 +89,10 @@ function NewUser() {
             </span>
           )}
           <div className="w-full flex justify-center my-4">
-            <button type="submit" className="btn btn-sm btn-outline text-accent">
+            <button
+              type="submit"
+              className="btn btn-sm btn-outline text-accent"
+            >
               Create New Password
             </button>
           </div>

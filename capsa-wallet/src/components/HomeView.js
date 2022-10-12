@@ -23,7 +23,7 @@ function HomeView() {
   };
 
   return (
-    <div className="m-4 flex justify-center bg-base-200 h-screen items-center w-full">
+    <div className="m-3 flex justify-center bg-base-200 h-screen items-center">
       <div className="flex flex-col w-2/3">
         <form onSubmit={handleSubmit(onSubmit)}>
           <input
@@ -41,7 +41,10 @@ function HomeView() {
             <span className="text-xs text-red-700">Incorrect Password</span>
           )}
           <div className="w-full flex justify-center my-4">
-            <button type="submit" className="btn btn-sm btn-outline text-accent">
+            <button
+              type="submit"
+              className="btn btn-sm btn-outline text-accent"
+            >
               Sign-In
             </button>
           </div>

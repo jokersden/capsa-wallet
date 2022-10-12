@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { themeChange } from "theme-change";
 import HomeView from "./components/HomeView";
 import NewUser from "./components/NewUser";
+import NewWallet from "./components/NewWallet";
 import { UserContext } from "./context/userContext";
-//import secureLocalStorage from "react-secure-storage";
 
 function App() {
   const [isLogged, setIsLogged] = useState(false);
   const [address, setAddress] = useState("");
-  const [userStep, setUserStep] = useState(0);
+  const [userStep, setUserStep] = useState(2);
 
   const user = {
     address,
@@ -21,9 +21,6 @@ function App() {
 
   useEffect(() => {
     themeChange(false);
-    //secureLocalStorage.setItem("password", "password");
-    //console.log(secureLocalStorage.getItem("password"), "app.js");
-    // 👆 false parameter is required for react project
   }, []);
 
   const renderSwitch = (step) => {
@@ -33,7 +30,7 @@ function App() {
       case 1:
         return <NewUser />;
       case 2:
-        return <>test</>;
+        return <NewWallet />;
       default:
         break;
     }
