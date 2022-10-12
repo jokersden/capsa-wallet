@@ -5,6 +5,8 @@ export const user = {
   setAddress: (address) => {},
   isLogged: true,
   setIsLogged: (status) => {},
+  userStep: 0,
+  setUserStep: (step) => {},
 };
 
 export const UserContext = createContext(user);

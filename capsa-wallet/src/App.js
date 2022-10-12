@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react";
 import { themeChange } from "theme-change";
 import HomeView from "./components/HomeView";
+import NewUser from "./components/NewUser";
 import { UserContext } from "./context/userContext";
 //import secureLocalStorage from "react-secure-storage";
 
 function App() {
   const [isLogged, setIsLogged] = useState(false);
   const [address, setAddress] = useState("");
+  const [userStep, setUserStep] = useState(0);
 
   const user = {
     address,
     setAddress,
     isLogged,
     setIsLogged,
+    userStep,
+    setUserStep,
   };
 
   useEffect(() => {
@@ -22,6 +26,19 @@ function App() {
     // 👆 false parameter is required for react project
   }, []);
 
+  const renderSwitch = (step) => {
+    switch (step) {
+      case 0:
+        return <HomeView />;
+      case 1:
+        return <NewUser />;
+      case 2:
+        return <>test</>;
+      default:
+        break;
+    }
+  };
+
   return (
     <UserContext.Provider value={user}>
       <div className="w-400 flex flex-col h-full">
@@ -29,7 +46,7 @@ function App() {
           type="checkbox"
           //data-choose-theme
           className="toggle mt-2 ml-2"
-          data-toggle-theme="dark,cupcake"
+          data-toggle-theme="dark,light"
           data-act-class="ACTIVECLASS"
           //checked
         ></input>
@@ -40,7 +57,7 @@ function App() {
             alt="Logo of Capsa wallet"
           ></img>
         </div>
-        <HomeView />
+        {renderSwitch(userStep)}
       </div>
     </UserContext.Provider>
   );

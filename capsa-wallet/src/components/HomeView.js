@@ -47,7 +47,12 @@ function HomeView() {
           </div>
         </form>
         <div className="m-5 flex flex-col items-center">
-          <button className="btn btn-active btn-link btn-xs">
+          <button
+            className="btn btn-active btn-link btn-xs"
+            onClick={() => {
+              user.setUserStep(1);
+            }}
+          >
             Create a New Wallet
           </button>
           <span>OR</span>
