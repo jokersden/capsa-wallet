@@ -41,14 +41,14 @@ function HomeView() {
             <span className="text-xs text-red-700">Incorrect Password</span>
           )}
           <div className="w-full flex justify-center my-4">
-            <button type="submit" className="btn btn-sm glass">
+            <button type="submit" className="btn btn-sm btn-outline text-accent">
               Sign-In
             </button>
           </div>
         </form>
         <div className="m-5 flex flex-col items-center">
           <button
-            className="btn btn-active btn-link btn-xs"
+            className="btn btn-active btn-link btn-xs text-accent"
             onClick={() => {
               user.setUserStep(1);
             }}
@@ -56,7 +56,7 @@ function HomeView() {
             Create a New Wallet
           </button>
           <span>OR</span>
-          <button className="btn btn-active btn-link btn-xs">
+          <button className="btn btn-active btn-link btn-xs text-accent">
             Import an Exsisting Wallet
           </button>
         </div>

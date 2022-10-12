@@ -52,8 +52,8 @@ function App() {
         ></input>
         <div className="flex justify-center">
           <img
-            src="https://pbs.twimg.com/profile_images/1498641868397191170/6qW2XkuI_400x400.png"
-            width={60}
+            src="/logo_transparent.png"
+            width={80}
             alt="Logo of Capsa wallet"
           ></img>
         </div>
