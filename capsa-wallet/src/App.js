@@ -6,13 +6,24 @@ import LoginView from "./components/LoginView";
 import NewUser from "./components/NewUser";
 import NewWallet from "./components/NewWallet";
 import HomeView from "./components/HomeView";
+import FromSeed from "./components/FromSeed";
 import { UserContext } from "./context/userContext";
+import {
+  IMG_WIDTH_INIT,
+  LOGIN_SCREEN,
+  ACCOUNT_SCREEN,
+  CONFIRM_SEED_SCREEN,
+  FROM_SEED_SCREEN,
+  NEW_PASSWORD_SCREEN,
+  NEW_WALLET_SEED_SCREEN,
+} from "./utils/configs";
 
 function App() {
   const [isLogged, setIsLogged] = useState(false);
   const [address, setAddress] = useState("");
-  const [userStep, setUserStep] = useState(0);
+  const [userStep, setUserStep] = useState(LOGIN_SCREEN);
   const [hasWallet, setHasWallet] = useState(false);
+  const [imgWidth, setImageWidth] = useState(IMG_WIDTH_INIT);
 
   const user = {
     address,
@@ -23,6 +34,7 @@ function App() {
     setUserStep,
     hasWallet,
     setHasWallet,
+    setImageWidth,
   };
 
   useEffect(() => {
@@ -30,20 +42,26 @@ function App() {
     if (getSecurely("address")) {
       setHasWallet(true);
     }
+    try {
+      let initStep = localStorage.getItem("userStep");
+      setUserStep(parseInt(initStep));
+    } catch (error) {}
   }, []);
 
   const renderSwitch = (step) => {
     switch (step) {
-      case 0:
+      case LOGIN_SCREEN:
         return <LoginView />;
-      case 1:
+      case NEW_PASSWORD_SCREEN:
         return <NewUser />;
-      case 2:
+      case NEW_WALLET_SEED_SCREEN:
         return <NewWallet />;
-      case 3:
+      case CONFIRM_SEED_SCREEN:
         return <ConfirmSeed />;
-      case 4:
+      case ACCOUNT_SCREEN:
         return <HomeView />;
+      case FROM_SEED_SCREEN:
+        return <FromSeed />;
       default:
         return <LoginView />;
     }
@@ -61,7 +79,7 @@ function App() {
         <div className="flex justify-center">
           <img
             src="/logo_transparent.png"
-            width={80}
+            width={imgWidth}
             alt="Logo of Capsa wallet"
           ></img>
         </div>

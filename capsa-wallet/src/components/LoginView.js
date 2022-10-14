@@ -2,6 +2,12 @@ import React, { useContext } from "react";
 import { UserContext } from "../context/userContext";
 import { useForm } from "react-hook-form";
 import { checkPass } from "../utils/secureStorage";
+import {
+  ACCOUNT_SCREEN,
+  FROM_SEED_SCREEN,
+  IMG_WIDTH_LOGGED,
+  NEW_PASSWORD_SCREEN,
+} from "../utils/configs";
 
 function LoginView() {
   const user = useContext(UserContext);
@@ -15,7 +21,8 @@ function LoginView() {
   const onSubmit = (data) => {
     if (checkPass(data.password)) {
       user.setIsLogged(true);
-      user.setUserStep(4);
+      user.setImageWidth(IMG_WIDTH_LOGGED);
+      user.setUserStep(ACCOUNT_SCREEN);
     } else {
       setError("password", { type: "mismatch" });
     }
@@ -54,13 +61,18 @@ function LoginView() {
             <button
               className="btn btn-active btn-link btn-xs text-accent"
               onClick={() => {
-                user.setUserStep(1);
+                user.setUserStep(NEW_PASSWORD_SCREEN);
               }}
             >
               Create a New Wallet
             </button>
             <span>OR</span>
-            <button className="btn btn-active btn-link btn-xs text-accent">
+            <button
+              className="btn btn-active btn-link btn-xs text-accent"
+              onClick={() => {
+                user.setUserStep(FROM_SEED_SCREEN);
+              }}
+            >
               Import an Exsisting Wallet
             </button>
           </div>

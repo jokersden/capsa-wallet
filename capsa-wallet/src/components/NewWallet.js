@@ -3,6 +3,7 @@ import { UserContext } from "../context/userContext";
 import { PropagateLoader } from "react-spinners";
 import { saveSecurely, getSecurely } from "../utils/secureStorage";
 import algosdk from "algosdk";
+import { CONFIRM_SEED_SCREEN, LOGIN_SCREEN } from "../utils/configs";
 
 function NewWallet() {
   //const [data, setData] = useState(null);
@@ -19,6 +20,7 @@ function NewWallet() {
       saveSecurely(JSON.stringify(account.sk), "pk");
       user.setAddress(account.addr);
       setLoading(false);
+      localStorage.setItem("userStep", CONFIRM_SEED_SCREEN);
     } catch (err) {
       setError(true);
     }
@@ -54,7 +56,7 @@ function NewWallet() {
           <div className="flex justify-center w-full mt-5 mb-3">
             <button
               className="btn btn-accent"
-              onClick={() => user.setUserStep(3)}
+              onClick={() => user.setUserStep(CONFIRM_SEED_SCREEN)}
             >
               Proceed
             </button>
@@ -69,7 +71,7 @@ function NewWallet() {
             </span>
             <div className="mt-8 w-full justify-center flex">
               <button
-                onClick={() => user.setUserStep(0)}
+                onClick={() => user.setUserStep(LOGIN_SCREEN)}
                 className="btn btn-ghost"
               >
                 <svg

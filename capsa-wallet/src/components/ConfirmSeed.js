@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { UserContext } from "../context/userContext";
 import { getSecurely } from "../utils/secureStorage";
+import { ACCOUNT_SCREEN, IMG_WIDTH_LOGGED } from "../utils/configs";
 
 function ConfirmSeed() {
   const user = useContext(UserContext);
@@ -20,12 +21,12 @@ function ConfirmSeed() {
       data.sixteenth === mn[15] &&
       data.twentyfourth === mn[23]
     ) {
-      user.setUserStep(4);
+      user.setImageWidth(IMG_WIDTH_LOGGED);
+      localStorage.removeItem("userStep");
+      user.setUserStep(ACCOUNT_SCREEN);
     } else {
       setError("twentyfourth", { type: "mismatch" });
     }
-    //getSecurely("mnemonic").split(" ")[24];
-    //user.setUserStep(4);
   };
 
   return (
