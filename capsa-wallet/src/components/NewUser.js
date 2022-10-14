@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { UserContext } from "../context/userContext";
 import { useForm } from "react-hook-form";
-import secureLocalStorage from "react-secure-storage";
+import { savePassword } from "../utils/secureStorage";
 
 function NewUser() {
   const user = useContext(UserContext);
@@ -14,7 +14,7 @@ function NewUser() {
 
   const onSubmit = (data) => {
     if (data.password === data.confirmation) {
-      secureLocalStorage.setItem("password", data.password);
+      savePassword(data.password);
       user.setUserStep(2);
     } else {
       setError("confirmation", { type: "mismatch" });

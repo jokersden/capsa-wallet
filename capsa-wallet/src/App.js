@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { getSecurely } from "./utils/secureStorage";
 import { themeChange } from "theme-change";
+import ConfirmSeed from "./components/ConfirmSeed";
 import HomeView from "./components/HomeView";
 import NewUser from "./components/NewUser";
 import NewWallet from "./components/NewWallet";
@@ -8,7 +10,8 @@ import { UserContext } from "./context/userContext";
 function App() {
   const [isLogged, setIsLogged] = useState(false);
   const [address, setAddress] = useState("");
-  const [userStep, setUserStep] = useState(2);
+  const [userStep, setUserStep] = useState(0);
+  const [hasWallet, setHasWallet] = useState(false);
 
   const user = {
     address,
@@ -17,10 +20,15 @@ function App() {
     setIsLogged,
     userStep,
     setUserStep,
+    hasWallet,
+    setHasWallet,
   };
 
   useEffect(() => {
     themeChange(false);
+    if (getSecurely("address")) {
+      setHasWallet(true);
+    }
   }, []);
 
   const renderSwitch = (step) => {
@@ -31,8 +39,10 @@ function App() {
         return <NewUser />;
       case 2:
         return <NewWallet />;
+      case 3:
+        return <ConfirmSeed />;
       default:
-        break;
+        return <HomeView />;
     }
   };
 
@@ -43,7 +53,7 @@ function App() {
           type="checkbox"
           //data-choose-theme
           className="toggle mt-2 ml-2"
-          data-toggle-theme="dark,light"
+          data-toggle-theme="dark,cupcake"
           data-act-class="ACTIVECLASS"
           //checked
         ></input>
