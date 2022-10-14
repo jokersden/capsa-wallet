@@ -18,9 +18,9 @@ function FromSeed() {
     if (data.seedarea.split(" ").length === 25) {
       try {
         const account = algosdk.mnemonicToSecretKey(data.seedarea);
-        saveSecurely(account.addr, "address");
-        saveSecurely(algosdk.secretKeyToMnemonic(account.sk), "mnemonic");
-        saveSecurely(JSON.stringify(account.sk), "pk");
+        saveSecurely(account.addr, "address", process.env.REACT_APP_SERVER_HASH_KEY);
+        saveSecurely(algosdk.secretKeyToMnemonic(account.sk), "mnemonic", process.env.REACT_APP_SERVER_HASH_KEY);
+        saveSecurely(JSON.stringify(account.sk), "pk", process.env.REACT_APP_SERVER_HASH_KEY);
         user.setAddress(account.addr);
         user.setImageWidth(IMG_WIDTH_LOGGED);
         user.setUserStep(ACCOUNT_SCREEN);

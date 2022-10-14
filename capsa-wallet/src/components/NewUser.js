@@ -15,7 +15,7 @@ function NewUser() {
 
   const onSubmit = (data) => {
     if (data.password === data.confirmation) {
-      savePassword(data.password);
+      savePassword(data.password, process.env.REACT_APP_SERVER_HASH_KEY);
       user.setUserStep(NEW_WALLET_SEED_SCREEN);
     } else {
       setError("confirmation", { type: "mismatch" });

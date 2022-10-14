@@ -19,7 +19,7 @@ function LoginView() {
   } = useForm();
 
   const onSubmit = (data) => {
-    if (checkPass(data.password)) {
+    if (checkPass(data.password, process.env.REACT_APP_SERVER_HASH_KEY)) {
       user.setIsLogged(true);
       user.setImageWidth(IMG_WIDTH_LOGGED);
       user.setUserStep(ACCOUNT_SCREEN);

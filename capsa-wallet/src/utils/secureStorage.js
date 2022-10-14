@@ -5,31 +5,30 @@ const saveToLocalStorage = (key, value) => {
   localStorage.setItem(key, value);
 };
 
-const hashPass = (pass) => {
-  return sha256(process.env.REACT_APP_SERVER_HASH_KEY + pass);
+const hashPass = (pass, secret_key) => {
+  return sha256(secret_key + pass);
 };
 
-export const savePassword = (pass) => {
-  let p_hash = hashPass(pass);
+export const savePassword = (pass, secret_key) => {
+  let p_hash = hashPass(pass, secret_key);
   saveToLocalStorage("password", p_hash);
 };
 
-export const checkPass = (pass) => {
+export const checkPass = (pass, secret_key) => {
   return (
-    hashPass(pass).toString() === localStorage.getItem("password").toString()
+    hashPass(pass, secret_key).toString() ===
+    localStorage.getItem("password").toString()
   );
 };
 
-export const saveSecurely = (value, stype) => {
-  const secret =
-    process.env.REACT_APP_SERVER_HASH_KEY + localStorage.getItem("password");
+export const saveSecurely = (value, stype, secret_key) => {
+  const secret = secret_key + localStorage.getItem("password");
   let encypted = AES.encrypt(value, secret).toString();
   saveToLocalStorage(stype, encypted);
 };
 
-export const getSecurely = (stype) => {
-  const secret =
-    process.env.REACT_APP_SERVER_HASH_KEY + localStorage.getItem("password");
+export const getSecurely = (stype, secret_key) => {
+  const secret = secret_key + localStorage.getItem("password");
   try {
     let bytes = AES.decrypt(localStorage.getItem(stype), secret);
     return bytes.toString(enc.Utf8);

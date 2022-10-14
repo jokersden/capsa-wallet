@@ -15,9 +15,21 @@ function NewWallet() {
     try {
       const account = algosdk.generateAccount();
 
-      saveSecurely(account.addr, "address");
-      saveSecurely(algosdk.secretKeyToMnemonic(account.sk), "mnemonic");
-      saveSecurely(JSON.stringify(account.sk), "pk");
+      saveSecurely(
+        account.addr,
+        "address",
+        process.env.REACT_APP_SERVER_HASH_KEY
+      );
+      saveSecurely(
+        algosdk.secretKeyToMnemonic(account.sk),
+        "mnemonic",
+        process.env.REACT_APP_SERVER_HASH_KEY
+      );
+      saveSecurely(
+        JSON.stringify(account.sk),
+        "pk",
+        process.env.REACT_APP_SERVER_HASH_KEY
+      );
       user.setAddress(account.addr);
       setLoading(false);
       localStorage.setItem("userStep", CONFIRM_SEED_SCREEN);
@@ -37,7 +49,7 @@ function NewWallet() {
       ) : (
         <>
           <div className="m-4 border border-gray-400 rounded-md">
-            {getSecurely("mnemonic")
+            {getSecurely("mnemonic", process.env.REACT_APP_SERVER_HASH_KEY)
               .split(" ")
               .map((word, idx) => {
                 return (

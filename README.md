@@ -1,2 +1,3 @@
-# capsa-wallet
-Capse wallet is the latest Algorand Wallet
+# Capsa Wallet
+
+#### The Algorand Wallet for the Web.
