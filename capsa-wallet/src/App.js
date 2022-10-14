@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { getSecurely } from "./utils/secureStorage";
 import { themeChange } from "theme-change";
 import ConfirmSeed from "./components/ConfirmSeed";
-import HomeView from "./components/HomeView";
+import LoginView from "./components/LoginView";
 import NewUser from "./components/NewUser";
 import NewWallet from "./components/NewWallet";
+import HomeView from "./components/HomeView";
 import { UserContext } from "./context/userContext";
 
 function App() {
@@ -34,15 +35,17 @@ function App() {
   const renderSwitch = (step) => {
     switch (step) {
       case 0:
-        return <HomeView />;
+        return <LoginView />;
       case 1:
         return <NewUser />;
       case 2:
         return <NewWallet />;
       case 3:
         return <ConfirmSeed />;
-      default:
+      case 4:
         return <HomeView />;
+      default:
+        return <LoginView />;
     }
   };
 
