@@ -1,32 +1,28 @@
 import React, { useEffect, useState, useContext } from "react";
-//import secureLocalStorage from "react-secure-storage";
 import { UserContext } from "../context/userContext";
 import { PropagateLoader } from "react-spinners";
 import { saveSecurely, getSecurely } from "../utils/secureStorage";
+import algosdk from "algosdk";
 
 function NewWallet() {
   //const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const user = useContext(UserContext);
-  const [test, setTest] = useState(0);
 
   useEffect(() => {
-    fetch(process.env.REACT_APP_SERVER_URL + "/create_account")
-      .then((res) => res.json())
-      .then((data) => {
-        saveSecurely(data.pk, "pk");
-        saveSecurely(data.address, "address");
-        saveSecurely(data.mnemonic, "mnemonic");
-        user.setAddress(data.address);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(true);
-        //setLoading(false);
-        //console.log(err);
-      });
-  }, [test]);
+    try {
+      const account = algosdk.generateAccount();
+
+      saveSecurely(account.addr, "address");
+      saveSecurely(algosdk.secretKeyToMnemonic(account.sk), "mnemonic");
+      saveSecurely(JSON.stringify(account.sk), "pk");
+      user.setAddress(account.addr);
+      setLoading(false);
+    } catch (err) {
+      setError(true);
+    }
+  }, []);
 
   return (
     <div className="m-4 flex flex-col bg-base-200 h-screen items-start">
@@ -41,8 +37,12 @@ function NewWallet() {
           <div className="m-4 border border-gray-400 rounded-md">
             {getSecurely("mnemonic")
               .split(" ")
-              .map((word) => {
-                return <span className="badge text-lg m-2">{word}</span>;
+              .map((word, idx) => {
+                return (
+                  <span key={idx} className="badge text-lg m-2">
+                    {word}
+                  </span>
+                );
               })}
           </div>
           <div className="m-4 text-center">

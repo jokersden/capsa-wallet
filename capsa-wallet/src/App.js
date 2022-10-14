@@ -54,11 +54,9 @@ function App() {
       <div className="w-400 flex flex-col h-full">
         <input
           type="checkbox"
-          //data-choose-theme
           className="toggle mt-2 ml-2"
           data-toggle-theme="dark,cupcake"
           data-act-class="ACTIVECLASS"
-          //checked
         ></input>
         <div className="flex justify-center">
           <img
