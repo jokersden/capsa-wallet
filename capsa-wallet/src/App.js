@@ -16,6 +16,7 @@ import {
   FROM_SEED_SCREEN,
   NEW_PASSWORD_SCREEN,
   NEW_WALLET_SEED_SCREEN,
+  PASSWORD_FROM_SEED_SCREEN,
 } from "./utils/configs";
 
 function App() {
@@ -39,7 +40,7 @@ function App() {
 
   useEffect(() => {
     themeChange(false);
-    if (getSecurely("address")) {
+    if (getSecurely("address", process.env.REACT_APP_SERVER_HASH_KEY)) {
       setHasWallet(true);
     }
     try {
@@ -58,10 +59,13 @@ function App() {
         return <NewWallet />;
       case CONFIRM_SEED_SCREEN:
         return <ConfirmSeed />;
-      case ACCOUNT_SCREEN:
-        return <HomeView />;
       case FROM_SEED_SCREEN:
         return <FromSeed />;
+      case PASSWORD_FROM_SEED_SCREEN:
+        return <NewUser />;
+      case ACCOUNT_SCREEN:
+        return <HomeView />;
+
       default:
         return <LoginView />;
     }

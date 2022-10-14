@@ -2,7 +2,12 @@ import React, { useContext } from "react";
 import { UserContext } from "../context/userContext";
 import { useForm } from "react-hook-form";
 import { savePassword } from "../utils/secureStorage";
-import { NEW_WALLET_SEED_SCREEN } from "../utils/configs";
+import {
+  NEW_WALLET_SEED_SCREEN,
+  NEW_PASSWORD_SCREEN,
+  PASSWORD_FROM_SEED_SCREEN,
+  FROM_SEED_SCREEN,
+} from "../utils/configs";
 
 function NewUser() {
   const user = useContext(UserContext);
@@ -16,7 +21,11 @@ function NewUser() {
   const onSubmit = (data) => {
     if (data.password === data.confirmation) {
       savePassword(data.password, process.env.REACT_APP_SERVER_HASH_KEY);
-      user.setUserStep(NEW_WALLET_SEED_SCREEN);
+      if (user.userStep === NEW_PASSWORD_SCREEN) {
+        user.setUserStep(NEW_WALLET_SEED_SCREEN);
+      } else if (user.userStep === PASSWORD_FROM_SEED_SCREEN) {
+        user.setUserStep(FROM_SEED_SCREEN);
+      }
     } else {
       setError("confirmation", { type: "mismatch" });
     }

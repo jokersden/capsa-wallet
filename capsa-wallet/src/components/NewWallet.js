@@ -6,7 +6,6 @@ import algosdk from "algosdk";
 import { CONFIRM_SEED_SCREEN, LOGIN_SCREEN } from "../utils/configs";
 
 function NewWallet() {
-  //const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const user = useContext(UserContext);

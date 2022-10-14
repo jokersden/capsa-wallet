@@ -4,9 +4,9 @@ import { useForm } from "react-hook-form";
 import { checkPass } from "../utils/secureStorage";
 import {
   ACCOUNT_SCREEN,
-  FROM_SEED_SCREEN,
   IMG_WIDTH_LOGGED,
   NEW_PASSWORD_SCREEN,
+  PASSWORD_FROM_SEED_SCREEN,
 } from "../utils/configs";
 
 function LoginView() {
@@ -70,7 +70,7 @@ function LoginView() {
             <button
               className="btn btn-active btn-link btn-xs text-accent"
               onClick={() => {
-                user.setUserStep(FROM_SEED_SCREEN);
+                user.setUserStep(PASSWORD_FROM_SEED_SCREEN);
               }}
             >
               Import an Exsisting Wallet
