@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import Cookies from "universal-cookie";
 import { UserContext } from "../context/userContext";
 import { useForm } from "react-hook-form";
 import { checkPass } from "../utils/secureStorage";
@@ -7,10 +8,12 @@ import {
   IMG_WIDTH_LOGGED,
   NEW_PASSWORD_SCREEN,
   PASSWORD_FROM_SEED_SCREEN,
+  AUTH_EXPIRY_TIME,
 } from "../utils/configs";
 
 function LoginView() {
   const user = useContext(UserContext);
+  var cookies = new Cookies();
   const {
     register,
     handleSubmit,
@@ -22,6 +25,10 @@ function LoginView() {
     if (checkPass(data.password, process.env.REACT_APP_SERVER_HASH_KEY)) {
       user.setIsLogged(true);
       user.setImageWidth(IMG_WIDTH_LOGGED);
+      cookies.set("authenticated_user", "yes", {
+        path: "/",
+        expires: new Date(Date.now() + AUTH_EXPIRY_TIME),
+      });
       user.setUserStep(ACCOUNT_SCREEN);
     } else {
       setError("password", { type: "mismatch" });

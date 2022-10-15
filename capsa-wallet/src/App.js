@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Cookies from "universal-cookie";
 import { getSecurely } from "./utils/secureStorage";
 import { themeChange } from "theme-change";
 import ConfirmSeed from "./components/ConfirmSeed";
@@ -25,6 +26,7 @@ function App() {
   const [userStep, setUserStep] = useState(LOGIN_SCREEN);
   const [hasWallet, setHasWallet] = useState(false);
   const [imgWidth, setImageWidth] = useState(IMG_WIDTH_INIT);
+  var cookies = new Cookies();
 
   const user = {
     address,
@@ -46,6 +48,9 @@ function App() {
     try {
       let initStep = localStorage.getItem("userStep");
       setUserStep(parseInt(initStep));
+      if (cookies.get("authenticated_user") !== undefined) {
+        setUserStep(ACCOUNT_SCREEN);
+      }
     } catch (error) {}
   }, []);
 
@@ -74,12 +79,14 @@ function App() {
   return (
     <UserContext.Provider value={user}>
       <div className="w-400 flex flex-col h-full">
-        <input
-          type="checkbox"
-          className="toggle mt-2 ml-2"
-          data-toggle-theme="dark,cupcake"
-          data-act-class="ACTIVECLASS"
-        ></input>
+        <div className="justify-end flex">
+          <input
+            type="checkbox"
+            className="toggle mt-2 ml-2"
+            data-toggle-theme="dark,cupcake"
+            data-act-class="ACTIVECLASS"
+          ></input>
+        </div>
         <div className="flex justify-center">
           <img
             src="/logo_transparent.png"
