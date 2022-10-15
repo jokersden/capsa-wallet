@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { UserContext } from "../context/userContext";
 import { saveSecurely } from "../utils/secureStorage";
 import algosdk from "algosdk";
-import { ACCOUNT_SCREEN, IMG_WIDTH_LOGGED } from "../utils/configs";
+import { ACCOUNT_SCREEN } from "../utils/configs";
 
 function FromSeed() {
   const user = useContext(UserContext);
@@ -18,11 +18,23 @@ function FromSeed() {
     if (data.seedarea.split(" ").length === 25) {
       try {
         const account = algosdk.mnemonicToSecretKey(data.seedarea);
-        saveSecurely(account.addr, "address", process.env.REACT_APP_SERVER_HASH_KEY);
-        saveSecurely(algosdk.secretKeyToMnemonic(account.sk), "mnemonic", process.env.REACT_APP_SERVER_HASH_KEY);
-        saveSecurely(JSON.stringify(account.sk), "pk", process.env.REACT_APP_SERVER_HASH_KEY);
+        saveSecurely(
+          account.addr,
+          "address",
+          process.env.REACT_APP_SERVER_HASH_KEY
+        );
+        saveSecurely(
+          algosdk.secretKeyToMnemonic(account.sk),
+          "mnemonic",
+          process.env.REACT_APP_SERVER_HASH_KEY
+        );
+        saveSecurely(
+          JSON.stringify(account.sk),
+          "pk",
+          process.env.REACT_APP_SERVER_HASH_KEY
+        );
         user.setAddress(account.addr);
-        user.setImageWidth(IMG_WIDTH_LOGGED);
+        //user.setImageWidth(IMG_WIDTH_LOGGED);
         user.setUserStep(ACCOUNT_SCREEN);
       } catch {
         setError("seedarea", {
