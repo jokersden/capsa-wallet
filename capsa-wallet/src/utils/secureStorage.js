@@ -5,18 +5,18 @@ const saveToLocalStorage = (key, value) => {
   localStorage.setItem(key, value);
 };
 
-const hashPass = (pass, secret_key) => {
-  return sha256(secret_key + pass);
+export const hashAPhrase = (phrase, secret_key) => {
+  return sha256(secret_key + phrase);
 };
 
 export const savePassword = (pass, secret_key) => {
-  let p_hash = hashPass(pass, secret_key);
+  let p_hash = hashAPhrase(pass, secret_key);
   saveToLocalStorage("password", p_hash);
 };
 
 export const checkPass = (pass, secret_key) => {
   return (
-    hashPass(pass, secret_key).toString() ===
+    hashAPhrase(pass, secret_key).toString() ===
     localStorage.getItem("password").toString()
   );
 };

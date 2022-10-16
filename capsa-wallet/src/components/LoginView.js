@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import Cookies from "universal-cookie";
 import { UserContext } from "../context/userContext";
 import { useForm } from "react-hook-form";
-import { checkPass } from "../utils/secureStorage";
+import { checkPass, hashAPhrase } from "../utils/secureStorage";
 import {
   ACCOUNT_SCREEN,
   IMG_WIDTH_LOGGED,
@@ -25,10 +25,23 @@ function LoginView() {
     if (checkPass(data.password, process.env.REACT_APP_SERVER_HASH_KEY)) {
       user.setIsLogged(true);
       user.setImageWidth(IMG_WIDTH_LOGGED);
-      cookies.set("authenticated_user", "yes", {
-        path: "/",
-        expires: new Date(Date.now() + AUTH_EXPIRY_TIME),
-      });
+      const at = Date.now();
+      cookies.set(
+        "authenticated_user",
+        {
+          status: "yes",
+          at,
+          view: ACCOUNT_SCREEN,
+          secret_phrase: hashAPhrase(
+            at,
+            process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
+          ).toString(),
+        },
+        {
+          path: "/",
+          expires: new Date(Date.now() + AUTH_EXPIRY_TIME),
+        }
+      );
       user.setUserStep(ACCOUNT_SCREEN);
     } else {
       setError("password", { type: "mismatch" });

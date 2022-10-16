@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/userContext";
 import { getSecurely } from "../utils/secureStorage";
 import { HashLoader } from "react-spinners";
+import Cookies from "universal-cookie";
 import algosdk from "algosdk";
 import {
   IMG_WIDTH_LOGGED,
@@ -10,13 +11,15 @@ import {
   PS_TOKEN,
 } from "../utils/configs";
 import truncateAddress from "../utils/addressUtils";
-import { ASSETS_IMG_SIZE } from "../utils/configs";
+import { ASSETS_IMG_SIZE, SEND_ALGO_SCREEN } from "../utils/configs";
 
 function HomeView() {
   const [accountInfo, setAccountInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [algoPrice, setAlgoPrice] = useState(0);
+  var cookies = new Cookies();
 
+  const user = useContext(UserContext);
   useEffect(() => {
     user.setImageWidth(IMG_WIDTH_LOGGED);
     const algodclient = new algosdk.Algodv2(
@@ -46,10 +49,8 @@ function HomeView() {
       .catch(console.error);
   }, []);
 
-  const user = useContext(UserContext);
-
   const sendAlgo = () => {
-    console.log("send");
+    user.setUserStep(SEND_ALGO_SCREEN);
   };
   const receiveAlgo = () => {
     console.log("receive");

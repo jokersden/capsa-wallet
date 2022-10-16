@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Cookies from "universal-cookie";
-import { getSecurely } from "./utils/secureStorage";
+import { getSecurely, hashAPhrase } from "./utils/secureStorage";
 import { themeChange } from "theme-change";
 import ConfirmSeed from "./components/ConfirmSeed";
 import LoginView from "./components/LoginView";
@@ -18,7 +18,9 @@ import {
   NEW_PASSWORD_SCREEN,
   NEW_WALLET_SEED_SCREEN,
   PASSWORD_FROM_SEED_SCREEN,
+  SEND_ALGO_SCREEN,
 } from "./utils/configs";
+import SendAlgo from "./components/User/SendAlgo";
 
 function App() {
   const [isLogged, setIsLogged] = useState(false);
@@ -26,6 +28,7 @@ function App() {
   const [userStep, setUserStep] = useState(LOGIN_SCREEN);
   const [hasWallet, setHasWallet] = useState(false);
   const [imgWidth, setImageWidth] = useState(IMG_WIDTH_INIT);
+  const [network, setNetwork] = useState(localStorage.getItem("network"));
   var cookies = new Cookies();
 
   const user = {
@@ -45,10 +48,20 @@ function App() {
     if (getSecurely("address", process.env.REACT_APP_SERVER_HASH_KEY)) {
       setHasWallet(true);
     }
+    if (localStorage.getItem("network") === null) {
+      setNetwork("TestNet");
+    }
     try {
       let initStep = localStorage.getItem("userStep");
       setUserStep(parseInt(initStep));
-      if (cookies.get("authenticated_user") !== undefined) {
+      // To stop authentication by adding the cookie manually.
+      if (
+        cookies.get("authenticated_user").secret_phrase.toString() ===
+        hashAPhrase(
+          cookies.get("authenticated_user").at,
+          process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
+        ).toString()
+      ) {
         setUserStep(ACCOUNT_SCREEN);
       }
     } catch (error) {}
@@ -70,7 +83,8 @@ function App() {
         return <NewUser />;
       case ACCOUNT_SCREEN:
         return <HomeView />;
-
+      case SEND_ALGO_SCREEN:
+        return <SendAlgo />;
       default:
         return <LoginView />;
     }
@@ -118,6 +132,14 @@ function App() {
           ></img>
         </div>
         {renderSwitch(userStep)}
+        <footer className="footer justify-between flex bg-base-100 mb-1 sticky">
+          <span className="ml-2 text-[10px] font-mono text-info">
+            {network}
+          </span>
+          <span className="mr-2 text-[10px] font-mono text-info">
+            {process.env.REACT_APP_VERSION}
+          </span>
+        </footer>
       </div>
     </UserContext.Provider>
   );
