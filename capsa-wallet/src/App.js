@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Cookies from "universal-cookie";
 import { getSecurely, hashAPhrase } from "./utils/secureStorage";
 import { themeChange } from "theme-change";
 import ConfirmSeed from "./components/ConfirmSeed";
@@ -21,6 +20,7 @@ import {
   SEND_ALGO_SCREEN,
 } from "./utils/configs";
 import SendAlgo from "./components/User/SendAlgo";
+import { getUserCookie } from "./utils/userCookies";
 
 function App() {
   const [isLogged, setIsLogged] = useState(false);
@@ -29,7 +29,6 @@ function App() {
   const [hasWallet, setHasWallet] = useState(false);
   const [imgWidth, setImageWidth] = useState(IMG_WIDTH_INIT);
   const [network, setNetwork] = useState(localStorage.getItem("network"));
-  var cookies = new Cookies();
 
   const user = {
     address,
@@ -55,14 +54,15 @@ function App() {
       let initStep = localStorage.getItem("userStep");
       setUserStep(parseInt(initStep));
       // To stop authentication by adding the cookie manually.
+      var authCookie = getUserCookie();
       if (
-        cookies.get("authenticated_user").secret_phrase.toString() ===
+        authCookie.secret_phrase.toString() ===
         hashAPhrase(
-          cookies.get("authenticated_user").at,
+          authCookie.at,
           process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
         ).toString()
       ) {
-        setUserStep(ACCOUNT_SCREEN);
+        setUserStep(authCookie.view);
       }
     } catch (error) {}
   }, []);

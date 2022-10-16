@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/userContext";
 import { getSecurely } from "../utils/secureStorage";
-import { HashLoader } from "react-spinners";
-import Cookies from "universal-cookie";
+import { HashLoader, DotLoader } from "react-spinners";
+//import Cookies from "universal-cookie";
 import algosdk from "algosdk";
 import {
   IMG_WIDTH_LOGGED,
@@ -17,7 +17,8 @@ function HomeView() {
   const [accountInfo, setAccountInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [algoPrice, setAlgoPrice] = useState(0);
-  var cookies = new Cookies();
+  const [qrImage, setQrImage] = useState(false);
+  //var cookies = new Cookies();
 
   const user = useContext(UserContext);
   useEffect(() => {
@@ -37,6 +38,7 @@ function HomeView() {
 
       setAccountInfo(data);
       setLoading(false);
+      user.setAddress(data.address);
     };
     accountInfoFunc().catch(console.error);
     fetch(
@@ -52,17 +54,23 @@ function HomeView() {
   const sendAlgo = () => {
     user.setUserStep(SEND_ALGO_SCREEN);
   };
-  const receiveAlgo = () => {
-    console.log("receive");
+  const genereateQR = () => {
+    fetch(
+      `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${user.address}&choe=UTF-8`
+    ).then((data) =>
+      data.blob().then((res) => {
+        setQrImage(res);
+      })
+    );
   };
   const swapAlgo = () => {
-    console.log("swap");
+    //console.log("swap");
   };
   const addAssets = () => {
     console.log("addAssets");
   };
   return (
-    <div>
+    <div className="h-screen">
       {loading ? (
         <div className="absolute left-44 top-52">
           <HashLoader color="#36d7b7" />
@@ -118,22 +126,24 @@ function HomeView() {
               <div
                 className="ml-16 p-2 rounded-3xl bg-accent-focus tooltip m-2 "
                 data-tip="Receive"
-                onClick={receiveAlgo}
+                onClick={genereateQR}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6 stroke-accent-content cursor-pointer"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15M9 12l3 3m0 0l3-3m-3 3V2.25"
-                  />
-                </svg>
+                <a href="#qr_screen">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6 stroke-accent-content cursor-pointer"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15M9 12l3 3m0 0l3-3m-3 3V2.25"
+                    />
+                  </svg>
+                </a>
               </div>
               <div
                 className="p-2 rounded-3xl bg-accent-focus tooltip m-2 "
@@ -157,7 +167,7 @@ function HomeView() {
               </div>
               <div
                 className="mr-16 p-2 rounded-3xl bg-accent-focus tooltip m-2 "
-                data-tip="Swap"
+                data-tip="Swap, Coming Soon!!"
                 onClick={swapAlgo}
               >
                 <svg
@@ -166,7 +176,7 @@ function HomeView() {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-6 h-6 stroke-accent-content cursor-pointer"
+                  className="w-6 h-6 cursor-pointer"
                 >
                   <path
                     strokeLinecap="round"
@@ -206,6 +216,22 @@ function HomeView() {
           </div>
         </>
       )}
+      <div className="modal" id="qr_screen">
+        <div className="modal-box w-96 flex flex-col">
+          {qrImage ? (
+            <img src={URL.createObjectURL(qrImage)} alt="qr code"></img>
+          ) : (
+            <div className="flex justify-center items-center">
+              <DotLoader color="#36d7b7" />
+            </div>
+          )}
+          <div className="modal-action ">
+            <a href="#" className="btn">
+              Close
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

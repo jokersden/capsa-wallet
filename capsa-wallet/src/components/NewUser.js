@@ -7,6 +7,7 @@ import {
   NEW_PASSWORD_SCREEN,
   PASSWORD_FROM_SEED_SCREEN,
   FROM_SEED_SCREEN,
+  LOGIN_SCREEN,
 } from "../utils/configs";
 
 function NewUser() {
@@ -34,8 +35,8 @@ function NewUser() {
     <div className="m-4 flex justify-center bg-base-200 h-screen items-center">
       <div className="absolute top-40 left-10">
         <button
-          className="btn btn-circle btn-outline"
-          onClick={() => user.setUserStep(user.userStep - 1)}
+          className="btn btn-circle btn-accent"
+          onClick={() => user.setUserStep(LOGIN_SCREEN)}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

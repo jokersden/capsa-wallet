@@ -10,6 +10,7 @@ import {
   PASSWORD_FROM_SEED_SCREEN,
   AUTH_EXPIRY_TIME,
 } from "../utils/configs";
+import { setUserCookies } from "../utils/userCookies";
 
 function LoginView() {
   const user = useContext(UserContext);
@@ -26,21 +27,11 @@ function LoginView() {
       user.setIsLogged(true);
       user.setImageWidth(IMG_WIDTH_LOGGED);
       const at = Date.now();
-      cookies.set(
-        "authenticated_user",
-        {
-          status: "yes",
-          at,
-          view: ACCOUNT_SCREEN,
-          secret_phrase: hashAPhrase(
-            at,
-            process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
-          ).toString(),
-        },
-        {
-          path: "/",
-          expires: new Date(Date.now() + AUTH_EXPIRY_TIME),
-        }
+      setUserCookies(
+        "logged",
+        at,
+        ACCOUNT_SCREEN,
+        process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
       );
       user.setUserStep(ACCOUNT_SCREEN);
     } else {
