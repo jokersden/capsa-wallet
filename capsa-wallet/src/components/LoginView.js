@@ -1,20 +1,17 @@
 import React, { useContext } from "react";
-import Cookies from "universal-cookie";
 import { UserContext } from "../context/userContext";
 import { useForm } from "react-hook-form";
-import { checkPass, hashAPhrase } from "../utils/secureStorage";
+import { checkPass } from "../utils/secureStorage";
 import {
   ACCOUNT_SCREEN,
   IMG_WIDTH_LOGGED,
   NEW_PASSWORD_SCREEN,
   PASSWORD_FROM_SEED_SCREEN,
-  AUTH_EXPIRY_TIME,
 } from "../utils/configs";
 import { setUserCookies } from "../utils/userCookies";
 
 function LoginView() {
   const user = useContext(UserContext);
-  var cookies = new Cookies();
   const {
     register,
     handleSubmit,
@@ -23,7 +20,12 @@ function LoginView() {
   } = useForm();
 
   const onSubmit = (data) => {
-    if (checkPass(data.password, process.env.REACT_APP_SERVER_HASH_KEY)) {
+    if (
+      checkPass(
+        data.password,
+        process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
+      )
+    ) {
       user.setIsLogged(true);
       user.setImageWidth(IMG_WIDTH_LOGGED);
       const at = Date.now();

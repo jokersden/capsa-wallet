@@ -17,17 +17,17 @@ function NewWallet() {
       saveSecurely(
         account.addr,
         "address",
-        process.env.REACT_APP_SERVER_HASH_KEY
+        process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
       );
       saveSecurely(
         algosdk.secretKeyToMnemonic(account.sk),
         "mnemonic",
-        process.env.REACT_APP_SERVER_HASH_KEY
+        process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
       );
       saveSecurely(
         JSON.stringify(account.sk),
         "pk",
-        process.env.REACT_APP_SERVER_HASH_KEY
+        process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
       );
       user.setAddress(account.addr);
       setLoading(false);
@@ -48,7 +48,10 @@ function NewWallet() {
       ) : (
         <>
           <div className="m-4 border border-gray-400 rounded-md">
-            {getSecurely("mnemonic", process.env.REACT_APP_SERVER_HASH_KEY)
+            {getSecurely(
+              "mnemonic",
+              process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
+            )
               .split(" ")
               .map((word, idx) => {
                 return (

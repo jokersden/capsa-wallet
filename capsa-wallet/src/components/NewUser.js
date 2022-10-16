@@ -21,7 +21,10 @@ function NewUser() {
 
   const onSubmit = (data) => {
     if (data.password === data.confirmation) {
-      savePassword(data.password, process.env.REACT_APP_SERVER_HASH_KEY);
+      savePassword(
+        data.password,
+        process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
+      );
       if (user.userStep === NEW_PASSWORD_SCREEN) {
         user.setUserStep(NEW_WALLET_SEED_SCREEN);
       } else if (user.userStep === PASSWORD_FROM_SEED_SCREEN) {

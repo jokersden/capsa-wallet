@@ -21,17 +21,17 @@ function FromSeed() {
         saveSecurely(
           account.addr,
           "address",
-          process.env.REACT_APP_SERVER_HASH_KEY
+          process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
         );
         saveSecurely(
           algosdk.secretKeyToMnemonic(account.sk),
           "mnemonic",
-          process.env.REACT_APP_SERVER_HASH_KEY
+          process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
         );
         saveSecurely(
           JSON.stringify(account.sk),
           "pk",
-          process.env.REACT_APP_SERVER_HASH_KEY
+          process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
         );
         user.setAddress(account.addr);
         //user.setImageWidth(IMG_WIDTH_LOGGED);

@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/userContext";
 import { getSecurely } from "../utils/secureStorage";
 import { HashLoader, DotLoader } from "react-spinners";
-//import Cookies from "universal-cookie";
 import algosdk from "algosdk";
 import {
   IMG_WIDTH_LOGGED,
@@ -32,7 +31,10 @@ function HomeView() {
     let accountInfoFunc = async () => {
       const data = await algodclient
         .accountInformation(
-          getSecurely("address", process.env.REACT_APP_SERVER_HASH_KEY)
+          getSecurely(
+            "address",
+            process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
+          )
         )
         .do();
 

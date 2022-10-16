@@ -16,7 +16,7 @@ function ConfirmSeed() {
   const onSubmit = (data) => {
     const mn = getSecurely(
       "mnemonic",
-      process.env.REACT_APP_SERVER_HASH_KEY
+      process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
     ).split(" ");
     if (
       data.fourth === mn[3] &&

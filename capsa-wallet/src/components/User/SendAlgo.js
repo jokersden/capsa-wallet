@@ -1,17 +1,23 @@
-import React, { useEffect, useContext } from "react";
-
+import React, { useEffect, useContext, useState } from "react";
+import { useForm } from "react-hook-form";
 import { UserContext } from "../../context/userContext";
+import algosdk from "algosdk";
 import {
   ACCOUNT_SCREEN,
   AUTH_EXPIRY_TIME,
   IMG_WIDTH_INIT,
   LOGIN_SCREEN,
+  PS_PORT,
+  PS_TESTNET_URL,
+  PS_TOKEN,
   SEND_ALGO_SCREEN,
 } from "../../utils/configs";
+import { checkPass, getSecurely } from "../../utils/secureStorage";
 import { updateUserScreen } from "../../utils/userCookies";
 
 function SendAlgo(props) {
   const user = useContext(UserContext);
+  const [sendView, setSendView] = useState(false);
 
   useEffect(() => {
     try {
@@ -21,6 +27,94 @@ function SendAlgo(props) {
     }
     user.setImageWidth(IMG_WIDTH_INIT);
   }, []);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+    getValues,
+  } = useForm();
+
+  const onSubmit = (data) => {
+    console.log(data.receiver.length);
+    if (data.receiver.length !== 58) {
+      setError("receiver", { type: "mismatch" });
+    } else if (1 !== 1) {
+      // check whether below max amount
+    } else {
+      setSendView(true);
+    }
+  };
+
+  const onSubmitPass = (data) => {
+    if (
+      checkPass(
+        data.password,
+        process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
+      )
+    ) {
+      // send tx
+      sendTx();
+    } else {
+      setError("password", { type: "mismatch" });
+    }
+  };
+
+  const sendTx = async () => {
+    const algodclient = new algosdk.Algodv2(
+      PS_TOKEN(process.env.REACT_APP_PURESTAKE_API_KEY),
+      PS_TESTNET_URL,
+      PS_PORT
+    );
+    let params = await algodclient.getTransactionParams().do();
+
+    params.fee = algosdk.ALGORAND_MIN_TX_FEE;
+    params.flatFee = true;
+
+    const receiver = getValues().receiver;
+    const enc = new TextEncoder();
+    const note = enc.encode("Sending a test tx");
+    let amount = algosdk.algosToMicroalgos(getValues().amount);
+    let sender = user.address;
+
+    let txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+      from: sender,
+      to: receiver,
+      amount: amount,
+      note: note,
+      suggestedParams: params,
+    });
+    // Sign the transaction
+
+    let signedTxn = txn.signTxn(
+      algosdk.mnemonicToSecretKey(
+        getSecurely(
+          "mnemonic",
+          process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
+        )
+      ).sk
+    );
+    let txId = txn.txID().toString();
+    console.log("Signed transaction with txID: %s", txId);
+
+    // Submit the transaction
+    await algodclient.sendRawTransaction(signedTxn).do();
+
+    // Wait for confirmation
+    let confirmedTxn = await algosdk.waitForConfirmation(algodclient, txId, 4);
+    //Get the completed Transaction
+    console.log(
+      "Transaction " +
+        txId +
+        " confirmed in round " +
+        confirmedTxn["confirmed-round"]
+    );
+    // let mytxinfo = JSON.stringify(confirmedTxn.txn.txn, undefined, 2);
+    // console.log("Transaction information: %o", mytxinfo);
+    let string = new TextDecoder().decode(confirmedTxn.txn.txn.note);
+    console.log("Note field: ", string);
+  };
 
   return (
     <div className="m-4 flex flex-col bg-base-200 h-screen items-center justify-center">
@@ -46,39 +140,105 @@ function SendAlgo(props) {
           </svg>
         </button>
       </div>
-      <div>
-        <form>
+      {!sendView ? (
+        <>
           <div>
-            <label className="label">
-              <span className="label-text">Receiver Address:</span>
-            </label>
-            <input
-              type="text"
-              className="input input-ghost border-b-2 border-0 border-b-accent-focus bg-base h-8"
-            ></input>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div>
+                <label className="label">
+                  <span className="label-text">Receiver Address:</span>
+                </label>
+                <div className="flex flex-col">
+                  <input
+                    type="text"
+                    className="input input-ghost border-b-2 border-0 border-b-accent-focus bg-base h-8"
+                    {...register("receiver", { required: true })}
+                  ></input>
+                  {errors.receiver?.type === "required" && (
+                    <span className="text-xs text-red-700">
+                      Receiver cannot be empty
+                    </span>
+                  )}
+                  {errors.receiver?.type === "mismatch" && (
+                    <span className="text-xs text-red-700">
+                      This is not a valid Algorand address
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="mt-8">
+                <label className="label">
+                  <span className="label-text">Amount to Send:</span>
+                  <button
+                    className="label-text-alt btn-xs btn-accent rounded-xl text-accent-content w-12"
+                    onClick={() => {}}
+                  >
+                    max
+                  </button>
+                </label>
+                <div className="flex flex-col">
+                  <input
+                    type="number"
+                    className="input input-ghost border-b-2 border-0 border-b-accent-focus bg-base h-8"
+                    {...register("amount", { required: true })}
+                  ></input>
+                  {errors.amount?.type === "required" && (
+                    <span className="text-xs text-red-700">
+                      Amount cannot be empty
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="justify-end flex mt-6">
+                <button type="submit" className="btn btn-accent">
+                  Next
+                </button>
+              </div>
+            </form>
           </div>
-          <div className="mt-8">
-            <label className="label">
-              <span className="label-text">Amount to Send:</span>
-              <button
-                className="label-text-alt btn-xs btn-accent rounded-xl text-accent-content w-12"
-                onClick={() => {}}
+        </>
+      ) : (
+        <div className="w-full">
+          <div className="flex-col justify-center text-sm flex">
+            <span className="italic font-semibold text-center ">
+              You are sending {getValues().amount} Algos to{" "}
+            </span>
+            <span className="text-warning text-center">{`${getValues().receiver.slice(
+              0,
+              30
+            )} ${getValues().receiver.slice(30)}`}</span>
+          </div>
+          <div className="m-5 mt-14 flex flex-col justify-center">
+            <span className="text-xs">
+              Confirm and Send by authenticating with your password
+            </span>
+            <div className="m-3">
+              <form
+                onSubmit={handleSubmit(onSubmitPass)}
+                className="flex flex-col justify-center "
               >
-                max
-              </button>
-            </label>
-            <input
-              type="text"
-              className="input input-ghost border-b-2 border-0 border-b-accent-focus bg-base h-8"
-            ></input>
+                <input
+                  type="password"
+                  placeholder="Enter your wallet password"
+                  {...register("password", { required: true })}
+                  className="input"
+                ></input>
+                {errors.password?.type === "required" && (
+                  <span className="text-xs text-red-700">
+                    Password cannot be empty
+                  </span>
+                )}
+                {errors.password?.type === "mismatch" && (
+                  <span className="text-xs text-red-700">
+                    Incorrect Password
+                  </span>
+                )}
+                <button className="btn btn-accent mt-5">Send</button>
+              </form>
+            </div>
           </div>
-          <div className="justify-end flex mt-6">
-            <button type="submit" className="btn btn-accent">
-              Next
-            </button>
-          </div>
-        </form>
-      </div>
+        </div>
+      )}
     </div>
   );
 }
