@@ -29,6 +29,7 @@ function App() {
   const [hasWallet, setHasWallet] = useState(false);
   const [imgWidth, setImageWidth] = useState(IMG_WIDTH_INIT);
   const [network, setNetwork] = useState(localStorage.getItem("network"));
+  const [txconfirmed, setTxconfirmed] = useState(false);
 
   const user = {
     address,
@@ -40,6 +41,8 @@ function App() {
     hasWallet,
     setHasWallet,
     setImageWidth,
+    txconfirmed,
+    setTxconfirmed,
   };
 
   const refreshPage = () => {
@@ -48,7 +51,12 @@ function App() {
 
   useEffect(() => {
     themeChange(false);
-    if (getSecurely("address", process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY)) {
+    if (
+      getSecurely(
+        "address",
+        process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
+      )
+    ) {
       setHasWallet(true);
     }
     if (localStorage.getItem("network") === null) {

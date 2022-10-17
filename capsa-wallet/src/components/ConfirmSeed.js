@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { UserContext } from "../context/userContext";
 import { getSecurely } from "../utils/secureStorage";
-import { ACCOUNT_SCREEN } from "../utils/configs";
+import { ACCOUNT_SCREEN, LOGIN_SCREEN } from "../utils/configs";
 
 function ConfirmSeed() {
   const user = useContext(UserContext);
@@ -25,7 +25,8 @@ function ConfirmSeed() {
       data.twentyfourth === mn[23]
     ) {
       localStorage.removeItem("userStep");
-      user.setUserStep(ACCOUNT_SCREEN);
+      user.setHasWallet(true);
+      user.setUserStep(LOGIN_SCREEN);
     } else {
       setError("twentyfourth", { type: "mismatch" });
     }

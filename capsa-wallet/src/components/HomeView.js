@@ -17,31 +17,31 @@ function HomeView() {
   const [loading, setLoading] = useState(true);
   const [algoPrice, setAlgoPrice] = useState(0);
   const [qrImage, setQrImage] = useState(false);
-  //var cookies = new Cookies();
 
   const user = useContext(UserContext);
-  useEffect(() => {
+
+  let accountInfoFunc = async () => {
     user.setImageWidth(IMG_WIDTH_LOGGED);
     const algodclient = new algosdk.Algodv2(
       PS_TOKEN(process.env.REACT_APP_PURESTAKE_API_KEY),
       PS_TESTNET_URL,
       PS_PORT
     );
-
-    let accountInfoFunc = async () => {
-      const data = await algodclient
-        .accountInformation(
-          getSecurely(
-            "address",
-            process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
-          )
+    const data = await algodclient
+      .accountInformation(
+        getSecurely(
+          "address",
+          process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
         )
-        .do();
+      )
+      .do();
 
-      setAccountInfo(data);
-      setLoading(false);
-      user.setAddress(data.address);
-    };
+    setAccountInfo(data);
+    setLoading(false);
+    user.setAddress(data.address);
+  };
+
+  useEffect(() => {
     accountInfoFunc().catch(console.error);
     fetch(
       "https://api.coingecko.com/api/v3/simple/price?ids=algorand&vs_currencies=usd"
@@ -51,7 +51,7 @@ function HomeView() {
         setAlgoPrice(data.algorand.usd);
       })
       .catch(console.error);
-  }, []);
+  }, [user.txconfirmed]);
 
   const sendAlgo = () => {
     user.setUserStep(SEND_ALGO_SCREEN);

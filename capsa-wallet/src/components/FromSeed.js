@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { UserContext } from "../context/userContext";
 import { saveSecurely } from "../utils/secureStorage";
 import algosdk from "algosdk";
-import { ACCOUNT_SCREEN } from "../utils/configs";
+import { ACCOUNT_SCREEN, LOGIN_SCREEN } from "../utils/configs";
 
 function FromSeed() {
   const user = useContext(UserContext);
@@ -35,7 +35,8 @@ function FromSeed() {
         );
         user.setAddress(account.addr);
         //user.setImageWidth(IMG_WIDTH_LOGGED);
-        user.setUserStep(ACCOUNT_SCREEN);
+        user.setHasWallet(true);
+        user.setUserStep(LOGIN_SCREEN);
       } catch {
         setError("seedarea", {
           type: "mismatch",

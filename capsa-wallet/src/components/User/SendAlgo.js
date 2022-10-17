@@ -18,6 +18,7 @@ import { updateUserScreen } from "../../utils/userCookies";
 function SendAlgo(props) {
   const user = useContext(UserContext);
   const [sendView, setSendView] = useState(false);
+  const [amount, setAmount] = useState(0);
 
   useEffect(() => {
     try {
@@ -34,14 +35,40 @@ function SendAlgo(props) {
     formState: { errors },
     setError,
     getValues,
+    setValue,
   } = useForm();
 
+  const goToMain = () => {
+    user.setUserStep(ACCOUNT_SCREEN);
+    updateUserScreen(ACCOUNT_SCREEN);
+  };
+  const maxExpendable = async () => {
+    const algodclient = new algosdk.Algodv2(
+      PS_TOKEN(process.env.REACT_APP_PURESTAKE_API_KEY),
+      PS_TESTNET_URL,
+      PS_PORT
+    );
+    const data = await algodclient
+      .accountInformation(
+        getSecurely(
+          "address",
+          process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
+        )
+      )
+      .do();
+    setAmount(
+      algosdk.microalgosToAlgos(data.amount - algosdk.ALGORAND_MIN_TX_FEE)
+    );
+  };
+  useEffect(() => {
+    maxExpendable();
+  }, []);
+
   const onSubmit = (data) => {
-    console.log(data.receiver.length);
     if (data.receiver.length !== 58) {
       setError("receiver", { type: "mismatch" });
-    } else if (1 !== 1) {
-      // check whether below max amount
+    } else if (getValues.amount <= amount) {
+      setError("amount", { type: "mismatch" });
     } else {
       setSendView(true);
     }
@@ -56,12 +83,22 @@ function SendAlgo(props) {
     ) {
       // send tx
       sendTx();
+      goToMain();
     } else {
       setError("password", { type: "mismatch" });
     }
   };
-
+  const showNotification = (title, body) => {
+    Notification.requestPermission().then((perm) => {
+      if (perm === "granted") {
+        new Notification(title, {
+          body,
+        });
+      }
+    });
+  };
   const sendTx = async () => {
+    showNotification("Sending Algo!", "You transaction is being submitted!.");
     const algodclient = new algosdk.Algodv2(
       PS_TOKEN(process.env.REACT_APP_PURESTAKE_API_KEY),
       PS_TESTNET_URL,
@@ -78,42 +115,69 @@ function SendAlgo(props) {
     let amount = algosdk.algosToMicroalgos(getValues().amount);
     let sender = user.address;
 
-    let txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-      from: sender,
-      to: receiver,
-      amount: amount,
-      note: note,
-      suggestedParams: params,
-    });
-    // Sign the transaction
+    try {
+      let txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+        from: sender,
+        to: receiver,
+        amount: amount,
+        note: note,
+        suggestedParams: params,
+      });
 
-    let signedTxn = txn.signTxn(
-      algosdk.mnemonicToSecretKey(
-        getSecurely(
-          "mnemonic",
-          process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
-        )
-      ).sk
-    );
-    let txId = txn.txID().toString();
-    console.log("Signed transaction with txID: %s", txId);
+      // Sign the transaction
 
-    // Submit the transaction
-    await algodclient.sendRawTransaction(signedTxn).do();
+      let signedTxn = txn.signTxn(
+        algosdk.mnemonicToSecretKey(
+          getSecurely(
+            "mnemonic",
+            process.env.REACT_APP_SECURE_LOCAL_STORAGE_HASH_KEY
+          )
+        ).sk
+      );
+      let txId = txn.txID().toString();
+      //console.log("Signed transaction with txID: %s", txId);
 
-    // Wait for confirmation
-    let confirmedTxn = await algosdk.waitForConfirmation(algodclient, txId, 4);
-    //Get the completed Transaction
-    console.log(
-      "Transaction " +
-        txId +
-        " confirmed in round " +
-        confirmedTxn["confirmed-round"]
-    );
+      // Submit the transaction
+
+      await algodclient.sendRawTransaction(signedTxn).do();
+
+      let confirmedTxn = await algosdk.waitForConfirmation(
+        algodclient,
+        txId,
+        4
+      );
+      //Get the completed Transaction
+      // console.log(
+      //   "Transaction " +
+      //     txId +
+      //     " confirmed in round " +
+      //     confirmedTxn["confirmed-round"]
+      // );
+      showNotification(
+        "Transaction Success!",
+        `You have successfull sent ${getValues().amount} to ${
+          getValues().receiver
+        }. Transaction Id: ${txId}`
+      );
+    } catch (error) {
+      // if the account amount is insufficient
+      if (error.message.includes("overspend")) {
+        showNotification(
+          "Transaction Failed!",
+          "You don't have enough Algos to send."
+        );
+      } else if (error.message.includes("address seems to be malformed")) {
+        showNotification("Transaction Failed!", "You Algos weren't sent.");
+      }
+    }
+    user.setTxconfirmed(!user.txconfirmed);
+
     // let mytxinfo = JSON.stringify(confirmedTxn.txn.txn, undefined, 2);
     // console.log("Transaction information: %o", mytxinfo);
-    let string = new TextDecoder().decode(confirmedTxn.txn.txn.note);
-    console.log("Note field: ", string);
+    //let string = new TextDecoder().decode(confirmedTxn.txn.txn.note);
+  };
+  const maxAlgos = () => {
+    setValue("amount", amount);
   };
 
   return (
@@ -122,8 +186,7 @@ function SendAlgo(props) {
         <button
           className="btn btn-circle btn-accent"
           onClick={() => {
-            user.setUserStep(ACCOUNT_SCREEN);
-            updateUserScreen(ACCOUNT_SCREEN);
+            goToMain();
           }}
         >
           <svg
@@ -170,8 +233,9 @@ function SendAlgo(props) {
                 <label className="label">
                   <span className="label-text">Amount to Send:</span>
                   <button
+                    type="button"
                     className="label-text-alt btn-xs btn-accent rounded-xl text-accent-content w-12"
-                    onClick={() => {}}
+                    onClick={maxAlgos}
                   >
                     max
                   </button>
@@ -179,12 +243,18 @@ function SendAlgo(props) {
                 <div className="flex flex-col">
                   <input
                     type="number"
+                    step="any"
                     className="input input-ghost border-b-2 border-0 border-b-accent-focus bg-base h-8"
                     {...register("amount", { required: true })}
                   ></input>
                   {errors.amount?.type === "required" && (
                     <span className="text-xs text-red-700">
                       Amount cannot be empty
+                    </span>
+                  )}
+                  {errors.amount?.type === "mismatch" && (
+                    <span className="text-xs text-red-700">
+                      You don't have enough Algos
                     </span>
                   )}
                 </div>
