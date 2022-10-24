@@ -10,6 +10,7 @@ export const PASSWORD_FROM_SEED_SCREEN = 4;
 export const FROM_SEED_SCREEN = 5;
 export const ACCOUNT_SCREEN = 6;
 export const SEND_ALGO_SCREEN = 7;
+export const SETTINGS_SCREEN = 8;
 
 export const AUTH_EXPIRY_TIME = 30 * 60000; // half an hour
 

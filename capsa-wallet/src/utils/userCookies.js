@@ -32,5 +32,5 @@ export const updateUserScreen = (screen) => {
 };
 
 export const deleteCookies = (name) => {
-  cookies.remove(name)
-}
+  cookies.remove(name);
+};

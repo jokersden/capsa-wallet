@@ -18,9 +18,12 @@ import {
   NEW_WALLET_SEED_SCREEN,
   PASSWORD_FROM_SEED_SCREEN,
   SEND_ALGO_SCREEN,
+  SETTINGS_SCREEN,
+  IMG_WIDTH_LOGGED,
 } from "./utils/configs";
 import SendAlgo from "./components/User/SendAlgo";
 import { getUserCookie, deleteCookies } from "./utils/userCookies";
+import Settings from "./components/Settings";
 
 function App() {
   const [isLogged, setIsLogged] = useState(false);
@@ -75,16 +78,18 @@ function App() {
         ).toString()
       ) {
         setUserStep(authCookie.view);
+        setIsLogged(true);
+        setImageWidth(IMG_WIDTH_LOGGED);
       }
-    } catch (error) { }
+    } catch (error) {}
   }, []);
 
   const logout = () => {
-    setIsLogged(false)
+    setIsLogged(false);
     setImageWidth(IMG_WIDTH_INIT);
-    deleteCookies('authenticated_user');
+    deleteCookies("authenticated_user");
     setUserStep(LOGIN_SCREEN);
-  }
+  };
 
   const renderSwitch = (step) => {
     switch (step) {
@@ -104,6 +109,8 @@ function App() {
         return <HomeView />;
       case SEND_ALGO_SCREEN:
         return <SendAlgo />;
+      case SETTINGS_SCREEN:
+        return <Settings />;
       default:
         return <LoginView />;
     }
@@ -138,7 +145,6 @@ function App() {
               />
             </svg>
 
-
             <div className="dropdown dropdown-end">
               <label tabIndex="0">
                 <svg
@@ -161,11 +167,18 @@ function App() {
                   />
                 </svg>
               </label>
-              <ul tabIndex="0" className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
-                <li>
+              <ul
+                tabIndex="0"
+                className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+              >
+                <li onClick={() => setUserStep(SETTINGS_SCREEN)}>
                   <a>Settings</a>
                 </li>
-                {isLogged && <li onClick={logout}><a>Logout</a></li>}
+                {isLogged && (
+                  <li onClick={logout}>
+                    <a>Logout</a>
+                  </li>
+                )}
               </ul>
             </div>
           </div>

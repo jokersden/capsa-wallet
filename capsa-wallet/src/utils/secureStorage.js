@@ -5,6 +5,16 @@ const saveToLocalStorage = (key, value) => {
   localStorage.setItem(key, value);
 };
 
+const deleteFromLocalStorage = (key) => {
+  localStorage.removeItem(key);
+};
+
+export const removeUserFromStorage = () => {
+  const keys = ["address", "pk", "mnemonic", "password"];
+
+  keys.map((key) => deleteFromLocalStorage(key));
+};
+
 export const hashAPhrase = (phrase, secret_key) => {
   return sha256(secret_key + phrase);
 };
