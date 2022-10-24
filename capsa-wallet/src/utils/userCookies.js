@@ -30,3 +30,7 @@ export const updateUserScreen = (screen) => {
     expires: new Date(Date.now() + AUTH_EXPIRY_TIME),
   });
 };
+
+export const deleteCookies = (name) => {
+  cookies.remove(name)
+}

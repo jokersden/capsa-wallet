@@ -13,10 +13,10 @@ export const SEND_ALGO_SCREEN = 7;
 
 export const AUTH_EXPIRY_TIME = 30 * 60000; // half an hour
 
-export const PS_TESTNET_URL = "https://testnet-algorand.api.purestake.io/ps2";
+export const PS_TESTNET_URL = "https://testnet-algorand.api.purestake.io/ps2/";
 export const PS_PORT = "";
 export const PS_TOKEN = (token) => {
   return {
-    "X-API-Key": token,
+    "X-API-Key": token
   };
 };

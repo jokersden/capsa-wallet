@@ -23,9 +23,10 @@ function HomeView() {
   let accountInfoFunc = async () => {
     user.setImageWidth(IMG_WIDTH_LOGGED);
     const algodclient = new algosdk.Algodv2(
-      PS_TOKEN(process.env.REACT_APP_PURESTAKE_API_KEY),
+      PS_TOKEN(
+        process.env.REACT_APP_PURESTAKE_API_KEY),
       PS_TESTNET_URL,
-      PS_PORT
+      PS_PORT,
     );
     const data = await algodclient
       .accountInformation(
