@@ -20,10 +20,12 @@ import {
   SEND_ALGO_SCREEN,
   SETTINGS_SCREEN,
   IMG_WIDTH_LOGGED,
+  ADD_ASSET_SCREEN,
 } from "./utils/configs";
 import SendAlgo from "./components/User/SendAlgo";
 import { getUserCookie, deleteCookies } from "./utils/userCookies";
 import Settings from "./components/Settings";
+import AddAsset from "./components/User/AddAsset";
 
 function App() {
   const [isLogged, setIsLogged] = useState(false);
@@ -111,6 +113,8 @@ function App() {
         return <SendAlgo />;
       case SETTINGS_SCREEN:
         return <Settings />;
+      case ADD_ASSET_SCREEN:
+        return <AddAsset />;
       default:
         return <LoginView />;
     }

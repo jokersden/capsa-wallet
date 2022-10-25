@@ -4,6 +4,7 @@ import { getSecurely } from "../utils/secureStorage";
 import { HashLoader, DotLoader } from "react-spinners";
 import algosdk from "algosdk";
 import {
+  ADD_ASSET_SCREEN,
   IMG_WIDTH_LOGGED,
   PS_PORT,
   PS_TESTNET_URL,
@@ -17,16 +18,21 @@ function HomeView() {
   const [loading, setLoading] = useState(true);
   const [algoPrice, setAlgoPrice] = useState(0);
   const [qrImage, setQrImage] = useState(false);
+  const [userAssets, setUserAssets] = useState({});
 
   const user = useContext(UserContext);
 
   let accountInfoFunc = async () => {
     user.setImageWidth(IMG_WIDTH_LOGGED);
     const algodclient = new algosdk.Algodv2(
-      PS_TOKEN(
-        process.env.REACT_APP_PURESTAKE_API_KEY),
+      PS_TOKEN(process.env.REACT_APP_PURESTAKE_API_KEY),
       PS_TESTNET_URL,
-      PS_PORT,
+      PS_PORT
+    );
+    const indexerClient = new algosdk.Indexer(
+      PS_TOKEN(process.env.REACT_APP_PURESTAKE_API_KEY),
+      PS_TESTNET_URL,
+      PS_PORT
     );
     const data = await algodclient
       .accountInformation(
@@ -40,6 +46,7 @@ function HomeView() {
     setAccountInfo(data);
     setLoading(false);
     user.setAddress(data.address);
+    getAssetHolding(algodclient, indexerClient, data.address);
   };
 
   useEffect(() => {
@@ -54,9 +61,6 @@ function HomeView() {
       .catch(console.error);
   }, [user.txconfirmed]);
 
-  const sendAlgo = () => {
-    user.setUserStep(SEND_ALGO_SCREEN);
-  };
   const genereateQR = () => {
     fetch(
       `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${user.address}&choe=UTF-8`
@@ -69,9 +73,21 @@ function HomeView() {
   const swapAlgo = () => {
     //console.log("swap");
   };
-  const addAssets = () => {
-    console.log("addAssets");
+
+  const getAssetHolding = async function (algodclient, indexerClient, account) {
+    let accountInfo = await algodclient.accountInformation(account).do();
+
+    for (let idx = 0; idx < accountInfo["assets"].length; idx++) {
+      let assetName = await indexerClient
+        .lookupAssetByID(accountInfo["assets"][idx]["asset-id"])
+        .do();
+      try {
+        accountInfo["assets"][idx]["params"] = assetName.params;
+      } catch (e) {}
+    }
+    setUserAssets(accountInfo["assets"]);
   };
+
   return (
     <div className="h-screen">
       {loading ? (
@@ -151,7 +167,7 @@ function HomeView() {
               <div
                 className="p-2 rounded-3xl bg-accent-focus tooltip m-2 "
                 data-tip="Send"
-                onClick={sendAlgo}
+                onClick={() => user.setUserStep(SEND_ALGO_SCREEN)}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -190,32 +206,82 @@ function HomeView() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col justify-center text-center m-14">
-            <span className="pb-4 font-bold">
-              You have not added any Assets yet!
-            </span>
-            <div className="">
-              <button
-                className="btn btn-accent rounded-3xl"
-                onClick={addAssets}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6 mr-2"
+          <div className="flex flex-col justify-center text-center m-10">
+            {userAssets.length > 0 ? (
+              <div className="bg-base-200">
+                <button
+                  className="btn btn-accent rounded-3xl -mt-5"
+                  onClick={() => user.setUserStep(ADD_ASSET_SCREEN)}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 4.5v15m7.5-7.5h-15"
-                  />
-                </svg>
-                Add Asset
-              </button>
-            </div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6 mr-2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 4.5v15m7.5-7.5h-15"
+                    />
+                  </svg>
+                  Add Asset
+                </button>
+                <ul className="">
+                  {userAssets.map((asset, i) => (
+                    <li
+                      key={asset["asset-id"]}
+                      className="py-3 border border-gray-800 hover:bg-base-300 hover:cursor-pointer"
+                      onClick={() => {}}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center justify-between w-full px-8">
+                          <p className="text-sm font-extrabold truncate">
+                            {asset["params"]["name"]}
+                          </p>
+                          <p>
+                            {parseInt(
+                              asset["amount"] /
+                                10 ** parseInt(asset["params"]["decimals"])
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div>
+                <span className="pb-4 font-bold">
+                  You have not added any Assets yet!
+                </span>
+                <div className="mt-2">
+                  <button
+                    className="btn btn-accent rounded-3xl"
+                    onClick={() => user.setUserStep(ADD_ASSET_SCREEN)}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-6 h-6 mr-2"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 4.5v15m7.5-7.5h-15"
+                      />
+                    </svg>
+                    Add Asset
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}

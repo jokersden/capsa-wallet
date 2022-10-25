@@ -4,7 +4,6 @@ import { UserContext } from "../../context/userContext";
 import algosdk from "algosdk";
 import {
   ACCOUNT_SCREEN,
-  AUTH_EXPIRY_TIME,
   IMG_WIDTH_INIT,
   LOGIN_SCREEN,
   PS_PORT,
@@ -14,6 +13,7 @@ import {
 } from "../../utils/configs";
 import { checkPass, getSecurely } from "../../utils/secureStorage";
 import { updateUserScreen } from "../../utils/userCookies";
+import { showNotification } from "../../utils/notifications";
 
 function SendAlgo(props) {
   const user = useContext(UserContext);
@@ -88,15 +88,7 @@ function SendAlgo(props) {
       setError("password", { type: "mismatch" });
     }
   };
-  const showNotification = (title, body) => {
-    Notification.requestPermission().then((perm) => {
-      if (perm === "granted") {
-        new Notification(title, {
-          body,
-        });
-      }
-    });
-  };
+
   const sendTx = async () => {
     showNotification("Sending Algo!", "You transaction is being submitted!.");
     const algodclient = new algosdk.Algodv2(

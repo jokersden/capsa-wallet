@@ -10,7 +10,8 @@ export const PASSWORD_FROM_SEED_SCREEN = 4;
 export const FROM_SEED_SCREEN = 5;
 export const ACCOUNT_SCREEN = 6;
 export const SEND_ALGO_SCREEN = 7;
-export const SETTINGS_SCREEN = 8;
+export const ADD_ASSET_SCREEN = 8;
+export const SETTINGS_SCREEN = 9;
 
 export const AUTH_EXPIRY_TIME = 30 * 60000; // half an hour
 
@@ -18,6 +19,6 @@ export const PS_TESTNET_URL = "https://testnet-algorand.api.purestake.io/ps2/";
 export const PS_PORT = "";
 export const PS_TOKEN = (token) => {
   return {
-    "X-API-Key": token
+    "X-API-Key": token,
   };
 };

@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { UserContext } from "../context/userContext";
-import { IMG_WIDTH_INIT, LOGIN_SCREEN } from "../utils/configs";
+import { IMG_WIDTH_INIT } from "../utils/configs";
 import { removeUserFromStorage } from "../utils/secureStorage";
 import { deleteCookies } from "../utils/userCookies";
 
@@ -13,6 +13,14 @@ function Settings() {
     user.setAddress(null);
     removeUserFromStorage();
     window.location.reload();
+  };
+  const onChange = (newValue) => {
+    new Notification("Hi there!");
+    console.log(Notification.permission);
+    if (newValue) {
+      Notification.requestPermission();
+    } else {
+    }
   };
   return (
     <div className="m-4 flex justify-center bg-base-200 h-screen items-center">
@@ -46,6 +54,16 @@ function Settings() {
           <option>TestNet</option>
           <option disabled>MainNet (Coming Soon)</option>
         </select>
+        <div className="form-control mt-4">
+          <label className="label cursor-pointer">
+            <span className="label-text">Notifactions</span>
+            <input
+              type="checkbox"
+              className="toggle toggle-accent"
+              onChange={(e) => onChange(e.target.checked)}
+            />
+          </label>
+        </div>
         {user.isLogged && (
           <label
             htmlFor="delet-account-modal"
