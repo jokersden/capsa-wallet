@@ -207,7 +207,7 @@ function HomeView() {
           </div>
           <div className="flex flex-col justify-center text-center m-10">
             {user.userAssets.length > 0 ? (
-              <div className="bg-base-200">
+              <div className="bg-base-200 rounded-xl drop-shadow-md">
                 <button
                   className="btn btn-accent rounded-3xl -mt-5"
                   onClick={() => user.setUserStep(ADD_ASSET_SCREEN)}
@@ -232,7 +232,7 @@ function HomeView() {
                   {user.userAssets.map((asset, i) => (
                     <li
                       key={asset["asset-id"]}
-                      className="py-3 border border-gray-800 hover:bg-base-300 hover:cursor-pointer"
+                      className="py-3 border border-base-100 hover:bg-base-300 hover:cursor-pointer"
                       onClick={() => {}}
                     >
                       <div className="flex items-center space-x-4">

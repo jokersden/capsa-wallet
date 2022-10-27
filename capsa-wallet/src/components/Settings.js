@@ -15,8 +15,6 @@ function Settings() {
     window.location.reload();
   };
   const onChange = (newValue) => {
-    new Notification("Hi there!");
-    console.log(Notification.permission);
     if (newValue) {
       Notification.requestPermission();
     } else {
