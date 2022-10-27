@@ -18,7 +18,6 @@ function HomeView() {
   const [loading, setLoading] = useState(true);
   const [algoPrice, setAlgoPrice] = useState(0);
   const [qrImage, setQrImage] = useState(false);
-  const [userAssets, setUserAssets] = useState({});
 
   const user = useContext(UserContext);
 
@@ -85,7 +84,7 @@ function HomeView() {
         accountInfo["assets"][idx]["params"] = assetName.params;
       } catch (e) {}
     }
-    setUserAssets(accountInfo["assets"]);
+    user.setUserAssets(accountInfo["assets"]);
   };
 
   return (
@@ -207,7 +206,7 @@ function HomeView() {
             </div>
           </div>
           <div className="flex flex-col justify-center text-center m-10">
-            {userAssets.length > 0 ? (
+            {user.userAssets.length > 0 ? (
               <div className="bg-base-200">
                 <button
                   className="btn btn-accent rounded-3xl -mt-5"
@@ -227,10 +226,10 @@ function HomeView() {
                       d="M12 4.5v15m7.5-7.5h-15"
                     />
                   </svg>
-                  Add Asset
+                  Opt-In
                 </button>
                 <ul className="">
-                  {userAssets.map((asset, i) => (
+                  {user.userAssets.map((asset, i) => (
                     <li
                       key={asset["asset-id"]}
                       className="py-3 border border-gray-800 hover:bg-base-300 hover:cursor-pointer"

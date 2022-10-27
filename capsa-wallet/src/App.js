@@ -22,7 +22,7 @@ import {
   IMG_WIDTH_LOGGED,
   ADD_ASSET_SCREEN,
 } from "./utils/configs";
-import SendAlgo from "./components/User/SendAlgo";
+import SendAlgo from "./components/User/SendCoins";
 import { getUserCookie, deleteCookies } from "./utils/userCookies";
 import Settings from "./components/Settings";
 import AddAsset from "./components/User/AddAsset";
@@ -35,6 +35,7 @@ function App() {
   const [imgWidth, setImageWidth] = useState(IMG_WIDTH_INIT);
   const [network, setNetwork] = useState(localStorage.getItem("network"));
   const [txconfirmed, setTxconfirmed] = useState(false);
+  const [userAssets, setUserAssets] = useState({});
 
   const user = {
     address,
@@ -48,6 +49,8 @@ function App() {
     setImageWidth,
     txconfirmed,
     setTxconfirmed,
+    userAssets,
+    setUserAssets,
   };
 
   const refreshPage = () => {
@@ -173,7 +176,7 @@ function App() {
               </label>
               <ul
                 tabIndex="0"
-                className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+                className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-300 rounded-box w-52"
               >
                 <li onClick={() => setUserStep(SETTINGS_SCREEN)}>
                   <a>Settings</a>

@@ -19,6 +19,7 @@ function SendAlgo(props) {
   const user = useContext(UserContext);
   const [sendView, setSendView] = useState(false);
   const [amount, setAmount] = useState(0);
+  const [tokenList, setTokenList] = useState({});
 
   useEffect(() => {
     try {
@@ -48,6 +49,7 @@ function SendAlgo(props) {
       PS_TESTNET_URL,
       PS_PORT
     );
+
     const data = await algodclient
       .accountInformation(
         getSecurely(
@@ -56,9 +58,20 @@ function SendAlgo(props) {
         )
       )
       .do();
-    setAmount(
-      algosdk.microalgosToAlgos(data.amount - algosdk.ALGORAND_MIN_TX_FEE)
-    );
+
+    let tokList = { 0: "Algo" };
+    let tokAmounts = {
+      0: algosdk.microalgosToAlgos(data.amount - algosdk.ALGORAND_MIN_TX_FEE),
+    };
+
+    user.userAssets.map((asset) => {
+      tokList[asset["asset-id"]] = asset["params"]["name"];
+      tokAmounts[asset["asset-id"]] = parseInt(
+        asset["amount"] / 10 ** parseInt(asset["params"]["decimals"])
+      );
+    });
+    setTokenList(tokList);
+    setAmount(tokAmounts);
   };
   useEffect(() => {
     maxExpendable();
@@ -67,7 +80,7 @@ function SendAlgo(props) {
   const onSubmit = (data) => {
     if (data.receiver.length !== 58) {
       setError("receiver", { type: "mismatch" });
-    } else if (getValues.amount <= amount) {
+    } else if (getValues().amount > amount[getValues().token]) {
       setError("amount", { type: "mismatch" });
     } else {
       setSendView(true);
@@ -103,18 +116,32 @@ function SendAlgo(props) {
 
     const receiver = getValues().receiver;
     const enc = new TextEncoder();
-    const note = enc.encode("Sending a test tx");
+    const note = enc.encode("Sending a tx");
     let amount = algosdk.algosToMicroalgos(getValues().amount);
     let sender = user.address;
 
     try {
-      let txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-        from: sender,
-        to: receiver,
-        amount: amount,
-        note: note,
-        suggestedParams: params,
-      });
+      let txn;
+      if (parseInt(getValues().token) === 0) {
+        txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+          from: sender,
+          to: receiver,
+          amount: amount,
+          note: note,
+          suggestedParams: params,
+        });
+      } else {
+        txn = algosdk.makeAssetTransferTxnWithSuggestedParams(
+          sender,
+          receiver,
+          undefined,
+          undefined,
+          amount,
+          note,
+          parseInt(getValues().token),
+          params
+        );
+      }
 
       // Sign the transaction
 
@@ -169,7 +196,7 @@ function SendAlgo(props) {
     //let string = new TextDecoder().decode(confirmedTxn.txn.txn.note);
   };
   const maxAlgos = () => {
-    setValue("amount", amount);
+    setValue("amount", amount[getValues().token]);
   };
 
   return (
@@ -199,6 +226,26 @@ function SendAlgo(props) {
         <>
           <div>
             <form onSubmit={handleSubmit(onSubmit)}>
+              <div>
+                <label className="label">
+                  <span className="label-text">Select a Coin to send:</span>
+                </label>
+                <div className="flex flex-col">
+                  <select
+                    className="select w-full max-w-xs"
+                    defaultValue={0}
+                    {...register("token", { required: true })}
+                  >
+                    {Object.keys(tokenList).map((token, i) => {
+                      return (
+                        <option key={token} value={token}>
+                          {tokenList[token]}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+              </div>
               <div>
                 <label className="label">
                   <span className="label-text">Receiver Address:</span>
@@ -246,7 +293,7 @@ function SendAlgo(props) {
                   )}
                   {errors.amount?.type === "mismatch" && (
                     <span className="text-xs text-red-700">
-                      You don't have enough Algos
+                      You don't have enough {tokenList[getValues().token]}
                     </span>
                   )}
                 </div>
