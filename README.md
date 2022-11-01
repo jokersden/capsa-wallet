@@ -85,6 +85,10 @@ Capsa is a Chrome extension which can be used to connect to Algorand blockchain:
   ![](images/light.png)
 
 
+#### A quick video demo
+
+[![Demo video](https://img.youtube.com/vi/mxL_Q6Q2yZg/0.jpg)](https://www.youtube.com/watch?v=mxL_Q6Q2yZg)
+
 
 ## Contributing
 
